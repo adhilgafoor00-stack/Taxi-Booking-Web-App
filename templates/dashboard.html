@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>User Dashboard</h2>
+<a href="/book" class="btn btn-primary">Book Taxi</a>
+<a href="/logout" class="btn btn-danger">Logout</a>
+<hr>
+<h4>Your Rides</h4>
+<table class="table">
+<tr><th>Pickup</th><th>Drop</th><th>Fare</th><th>Status</th></tr>
+{% for b in bookings %}
+<tr>
+<td>{{ b.pickup }}</td>
+<td>{{ b.drop }}</td>
+<td>{{ b.fare }}</td>
+<td>{{ b.status }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
