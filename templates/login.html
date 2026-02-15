@@ -1,10 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Login</h2>
-<form method="POST">
-<input name="email" type="email" placeholder="Email" class="form-control mb-2" required>
-<input name="password" type="password" placeholder="Password" class="form-control mb-2" required>
-<button class="btn btn-success">Login</button>
-</form>
-<a href="/register">Register</a>
+
+<div class="card">
+    <h2>Login to SwiftCab</h2>
+    <form method="POST">
+
+        <div class="form-group">
+            <input type="email" name="email" placeholder="Email" required>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="password" placeholder="Password" required>
+        </div>
+
+        <button class="btn btn-primary">Login</button>
+    </form>
+
+    <br>
+    <a href="/register">Don't have account? Register</a>
+</div>
+
 {% endblock %}

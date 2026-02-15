@@ -1,15 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Taxi App</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>SwiftCab</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
-<body class="container mt-5">
+<body>
+
+<div class="navbar">
+    <div class="logo">🚖 SwiftCab</div>
+    <div class="nav-links">
+        {% if current_user.is_authenticated %}
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Logout</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container">
+
     {% with messages = get_flashed_messages() %}
-      {% for msg in messages %}
-        <div class="alert alert-info">{{ msg }}</div>
-      {% endfor %}
+        {% for msg in messages %}
+            <div class="alert">{{ msg }}</div>
+        {% endfor %}
     {% endwith %}
+
     {% block content %}{% endblock %}
+</div>
+
 </body>
 </html>

@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>Book Taxi</h2>
+<div class="hero">
+    <h1>Book Your Ride</h1>
+    <p>Select pickup and drop on map</p>
+</div>
 
-<div id="map" style="height: 400px;"></div>
+<div class="card">
 
-<form method="POST" id="bookingForm">
+<div id="map"></div>
+
+<form method="POST">
     <input type="hidden" name="pickup" id="pickup">
     <input type="hidden" name="drop" id="drop">
     <input type="hidden" name="distance" id="distance">
@@ -15,57 +20,12 @@
     <p><strong>Distance:</strong> <span id="distance_text">0</span> km</p>
     <p><strong>Estimated Fare:</strong> ₹<span id="fare_text">0</span></p>
 
-    <button class="btn btn-success mt-3">Confirm Booking</button>
+    <br>
+    <button class="btn btn-primary">Confirm Booking</button>
 </form>
 
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+</div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<script>
-var map = L.map('map').setView([11.2588, 75.7804], 13); // Kozhikode default
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-var pickupMarker, dropMarker;
-var clickCount = 0;
-
-map.on('click', function(e) {
-
-    if (clickCount === 0) {
-        if (pickupMarker) map.removeLayer(pickupMarker);
-        pickupMarker = L.marker(e.latlng).addTo(map);
-        document.getElementById("pickup").value = e.latlng.lat + "," + e.latlng.lng;
-        document.getElementById("pickup_text").innerText = e.latlng.lat + "," + e.latlng.lng;
-        clickCount++;
-    } else {
-        if (dropMarker) map.removeLayer(dropMarker);
-        dropMarker = L.marker(e.latlng).addTo(map);
-        document.getElementById("drop").value = e.latlng.lat + "," + e.latlng.lng;
-        document.getElementById("drop_text").innerText = e.latlng.lat + "," + e.latlng.lng;
-
-        calculateDistance();
-        clickCount = 0;
-    }
-});
-
-function calculateDistance() {
-    var p = pickupMarker.getLatLng();
-    var d = dropMarker.getLatLng();
-
-    var distance = map.distance(p, d) / 1000; // meters → km
-    distance = distance.toFixed(2);
-
-    document.getElementById("distance").value = distance;
-    document.getElementById("distance_text").innerText = distance;
-
-    var fare = 50 + (distance * 10);
-    document.getElementById("fare_text").innerText = fare.toFixed(2);
-}
-</script>
+<!-- Leaflet CSS + JS (keep your previous JS code here) -->
 
 {% endblock %}

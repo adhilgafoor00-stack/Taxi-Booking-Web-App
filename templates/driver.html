@@ -1,17 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Driver Dashboard</h2>
-<a href="/logout" class="btn btn-danger">Logout</a>
-<hr>
-<table class="table">
-<tr><th>Pickup</th><th>Drop</th><th>Fare</th><th>Action</th></tr>
-{% for b in bookings %}
-<tr>
-<td>{{ b.pickup }}</td>
-<td>{{ b.drop }}</td>
-<td>{{ b.fare }}</td>
-<td><a href="/accept/{{ b.id }}" class="btn btn-success">Accept</a></td>
-</tr>
-{% endfor %}
-</table>
+
+<div class="hero">
+    <h1>Driver Dashboard</h1>
+    <p>Accept available rides.</p>
+</div>
+
+<div class="card">
+    <table>
+        <tr>
+            <th>Pickup</th>
+            <th>Drop</th>
+            <th>Fare</th>
+            <th>Action</th>
+        </tr>
+        {% for b in bookings %}
+        <tr>
+            <td>{{ b.pickup }}</td>
+            <td>{{ b.drop }}</td>
+            <td>₹{{ b.fare }}</td>
+            <td>
+                <a href="/accept/{{ b.id }}" class="btn btn-success">Accept</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
 {% endblock %}
