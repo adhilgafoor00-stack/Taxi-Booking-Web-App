@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 
+<!-- Leaflet CSS -->
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
 <div class="hero">
     <h1>Book Your Ride</h1>
     <p>Select pickup and drop on map</p>
@@ -8,24 +12,75 @@
 
 <div class="card">
 
-<div id="map"></div>
+    <div id="map"></div>
 
-<form method="POST">
-    <input type="hidden" name="pickup" id="pickup">
-    <input type="hidden" name="drop" id="drop">
-    <input type="hidden" name="distance" id="distance">
+    <form method="POST">
+        <input type="hidden" name="pickup" id="pickup">
+        <input type="hidden" name="drop" id="drop">
+        <input type="hidden" name="distance" id="distance">
 
-    <p><strong>Pickup:</strong> <span id="pickup_text">Not selected</span></p>
-    <p><strong>Drop:</strong> <span id="drop_text">Not selected</span></p>
-    <p><strong>Distance:</strong> <span id="distance_text">0</span> km</p>
-    <p><strong>Estimated Fare:</strong> ₹<span id="fare_text">0</span></p>
+        <p><strong>Pickup:</strong> <span id="pickup_text">Not selected</span></p>
+        <p><strong>Drop:</strong> <span id="drop_text">Not selected</span></p>
+        <p><strong>Distance:</strong> <span id="distance_text">0</span> km</p>
+        <p><strong>Estimated Fare:</strong> ₹<span id="fare_text">0</span></p>
 
-    <br>
-    <button class="btn btn-primary">Confirm Booking</button>
-</form>
+        <br>
+        <button class="btn btn-primary">Confirm Booking</button>
+    </form>
 
 </div>
 
-<!-- Leaflet CSS + JS (keep your previous JS code here) -->
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map').setView([11.2588, 75.7804], 13); // Default location
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    var pickupMarker = null;
+    var dropMarker = null;
+    var clickCount = 0;
+
+    map.on('click', function(e) {
+
+        if (clickCount === 0) {
+            if (pickupMarker) map.removeLayer(pickupMarker);
+
+            pickupMarker = L.marker(e.latlng).addTo(map);
+            document.getElementById("pickup").value = e.latlng.lat + "," + e.latlng.lng;
+            document.getElementById("pickup_text").innerText =
+                e.latlng.lat.toFixed(5) + ", " + e.latlng.lng.toFixed(5);
+
+            clickCount = 1;
+
+        } else {
+            if (dropMarker) map.removeLayer(dropMarker);
+
+            dropMarker = L.marker(e.latlng).addTo(map);
+            document.getElementById("drop").value = e.latlng.lat + "," + e.latlng.lng;
+            document.getElementById("drop_text").innerText =
+                e.latlng.lat.toFixed(5) + ", " + e.latlng.lng.toFixed(5);
+
+            calculateDistance();
+            clickCount = 0;
+        }
+    });
+
+    function calculateDistance() {
+
+        var pickup = pickupMarker.getLatLng();
+        var drop = dropMarker.getLatLng();
+
+        var distance = map.distance(pickup, drop) / 1000; // km
+        document.getElementById("distance").value = distance.toFixed(2);
+        document.getElementById("distance_text").innerText = distance.toFixed(2);
+
+        var fare = distance * 10;
+        document.getElementById("fare_text").innerText = fare.toFixed(2);
+    }
+</script>
 
 {% endblock %}

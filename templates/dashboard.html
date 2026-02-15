@@ -17,15 +17,31 @@
             <th>Drop</th>
             <th>Fare</th>
             <th>Status</th>
+            <th>Driver</th>
+            <th>Contact</th>
         </tr>
+
         {% for b in bookings %}
         <tr>
             <td>{{ b.pickup }}</td>
             <td>{{ b.drop }}</td>
             <td>₹{{ b.fare }}</td>
             <td>{{ b.status }}</td>
+
+            {% if b.status == "Accepted" and b.driver %}
+                <td>{{ b.driver.name }}</td>
+                <td>
+                    <a href="tel:{{ b.driver.phone }}" class="btn btn-success">
+                        Call {{ b.driver.phone }}
+                    </a>
+                </td>
+            {% else %}
+                <td>-</td>
+                <td>-</td>
+            {% endif %}
         </tr>
         {% endfor %}
+
     </table>
 </div>
 

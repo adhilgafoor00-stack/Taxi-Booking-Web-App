@@ -3,28 +3,79 @@
 
 <div class="hero">
     <h1>Driver Dashboard</h1>
-    <p>Accept available rides.</p>
+    <p>Manage and accept rides.</p>
 </div>
 
 <div class="card">
+
+    <h3>Available Rides</h3>
+
     <table>
         <tr>
+            <th>User</th>
+            <th>Phone</th>
             <th>Pickup</th>
             <th>Drop</th>
             <th>Fare</th>
             <th>Action</th>
         </tr>
+
         {% for b in bookings %}
+        {% if b.status == "Pending" %}
         <tr>
+            <td>{{ b.user.name }}</td>
+            <td>
+                <a href="tel:{{ b.user.phone }}">
+                    {{ b.user.phone }}
+                </a>
+            </td>
             <td>{{ b.pickup }}</td>
             <td>{{ b.drop }}</td>
             <td>₹{{ b.fare }}</td>
             <td>
-                <a href="/accept/{{ b.id }}" class="btn btn-success">Accept</a>
+                <a href="/accept/{{ b.id }}" class="btn btn-success">
+                    Accept
+                </a>
             </td>
         </tr>
+        {% endif %}
         {% endfor %}
     </table>
+
+</div>
+
+<div class="card" style="margin-top:30px;">
+
+    <h3>Your Accepted Rides</h3>
+
+    <table>
+        <tr>
+            <th>User</th>
+            <th>Phone</th>
+            <th>Pickup</th>
+            <th>Drop</th>
+            <th>Fare</th>
+            <th>Status</th>
+        </tr>
+
+        {% for b in bookings %}
+        {% if b.status == "Accepted" and b.driver_id == current_user.id %}
+        <tr>
+            <td>{{ b.user.name }}</td>
+            <td>
+                <a href="tel:{{ b.user.phone }}">
+                    {{ b.user.phone }}
+                </a>
+            </td>
+            <td>{{ b.pickup }}</td>
+            <td>{{ b.drop }}</td>
+            <td>₹{{ b.fare }}</td>
+            <td style="color:green;">Accepted</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+
 </div>
 
 {% endblock %}
