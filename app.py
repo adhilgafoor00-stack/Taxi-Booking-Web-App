@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import random
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -40,6 +41,9 @@ class Booking(db.Model):
     fare = db.Column(db.Float)
 
     status = db.Column(db.String(50), default="Pending")
+
+    otp = db.Column(db.String(6))
+    otp_verified = db.Column(db.Boolean, default=False)
 
     user = db.relationship("User", foreign_keys=[user_id])
     driver = db.relationship("User", foreign_keys=[driver_id])
@@ -128,9 +132,16 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
+
     if current_user.role == "driver":
-        bookings = Booking.query.filter_by(status="Pending").all()
-        return render_template("driver.html", bookings=bookings)
+        pending_rides = Booking.query.filter_by(status="Pending").all()
+        accepted_rides = Booking.query.filter_by(driver_id=current_user.id).all()
+
+        return render_template(
+            "driver.html",
+            pending_rides=pending_rides,
+            accepted_rides=accepted_rides
+        )
 
     bookings = Booking.query.filter_by(user_id=current_user.id).all()
     return render_template("dashboard.html", bookings=bookings)
@@ -140,6 +151,7 @@ def dashboard():
 @app.route("/book", methods=["GET", "POST"])
 @login_required
 def book():
+
     if request.method == "POST":
 
         pickup = request.form.get("pickup")
@@ -156,20 +168,24 @@ def book():
             flash("Invalid distance value.")
             return redirect("/book")
 
-        fare = distance * 10  # ₹10 per km
+        fare = distance * 10
+
+        # Generate 4-digit OTP
+        otp = str(random.randint(1000, 9999))
 
         booking = Booking(
             user_id=current_user.id,
             pickup=pickup,
             drop=drop,
             distance=distance,
-            fare=fare
+            fare=fare,
+            otp=otp
         )
 
         db.session.add(booking)
         db.session.commit()
 
-        flash("Ride booked successfully!")
+        flash("Ride booked successfully! OTP generated.")
         return redirect("/dashboard")
 
     return render_template("book.html")
@@ -186,12 +202,58 @@ def accept(id):
 
     booking = Booking.query.get_or_404(id)
 
+    if booking.status != "Pending":
+        flash("Ride already accepted.")
+        return redirect("/dashboard")
+
     booking.status = "Accepted"
     booking.driver_id = current_user.id
 
     db.session.commit()
 
     flash("Ride accepted successfully!")
+    return redirect("/dashboard")
+
+
+# VERIFY OTP
+@app.route("/verify_otp/<int:id>", methods=["POST"])
+@login_required
+def verify_otp(id):
+
+    if current_user.role != "driver":
+        flash("Access denied.")
+        return redirect("/dashboard")
+
+    booking = Booking.query.get_or_404(id)
+
+    entered_otp = request.form.get("entered_otp")
+
+    if booking.otp == entered_otp:
+        booking.otp_verified = True
+        booking.status = "Ride Started"
+        db.session.commit()
+        flash("OTP verified! Ride started.")
+    else:
+        flash("Incorrect OTP.")
+
+    return redirect("/dashboard")
+
+
+# COMPLETE RIDE
+@app.route("/complete/<int:id>")
+@login_required
+def complete(id):
+
+    booking = Booking.query.get_or_404(id)
+
+    if current_user.role != "driver":
+        flash("Access denied.")
+        return redirect("/dashboard")
+
+    booking.status = "Completed"
+    db.session.commit()
+
+    flash("Ride completed successfully!")
     return redirect("/dashboard")
 
 

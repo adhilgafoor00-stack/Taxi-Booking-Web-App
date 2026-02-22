@@ -3,9 +3,10 @@
 
 <div class="hero">
     <h1>Driver Dashboard</h1>
-    <p>Manage and accept rides.</p>
+    <p>Manage and verify rides securely.</p>
 </div>
 
+<!-- AVAILABLE RIDES -->
 <div class="card">
 
     <h3>Available Rides</h3>
@@ -20,15 +21,10 @@
             <th>Action</th>
         </tr>
 
-        {% for b in bookings %}
-        {% if b.status == "Pending" %}
+        {% for b in pending_rides %}
         <tr>
             <td>{{ b.user.name }}</td>
-            <td>
-                <a href="tel:{{ b.user.phone }}">
-                    {{ b.user.phone }}
-                </a>
-            </td>
+            <td><a href="tel:{{ b.user.phone }}">{{ b.user.phone }}</a></td>
             <td>{{ b.pickup }}</td>
             <td>{{ b.drop }}</td>
             <td>₹{{ b.fare }}</td>
@@ -38,42 +34,68 @@
                 </a>
             </td>
         </tr>
-        {% endif %}
         {% endfor %}
     </table>
 
 </div>
 
+
+<!-- ACCEPTED RIDES -->
 <div class="card" style="margin-top:30px;">
 
-    <h3>Your Accepted Rides</h3>
+    <h3>Your Rides</h3>
 
     <table>
         <tr>
             <th>User</th>
             <th>Phone</th>
             <th>Pickup</th>
-            <th>Drop</th>
             <th>Fare</th>
             <th>Status</th>
+            <th>OTP</th>
+            <th>Action</th>
         </tr>
 
-        {% for b in bookings %}
-        {% if b.status == "Accepted" and b.driver_id == current_user.id %}
+        {% for b in accepted_rides %}
         <tr>
             <td>{{ b.user.name }}</td>
-            <td>
-                <a href="tel:{{ b.user.phone }}">
-                    {{ b.user.phone }}
-                </a>
-            </td>
+            <td><a href="tel:{{ b.user.phone }}">{{ b.user.phone }}</a></td>
             <td>{{ b.pickup }}</td>
-            <td>{{ b.drop }}</td>
             <td>₹{{ b.fare }}</td>
-            <td style="color:green;">Accepted</td>
+            <td>{{ b.status }}</td>
+
+            <td>
+                {% if b.status == "Accepted" %}
+                    {{ b.otp }}
+                {% elif b.status == "Ride Started" %}
+                    Verified ✅
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+
+                {% if b.status == "Accepted" %}
+                    <form method="POST" action="/verify_otp/{{ b.id }}">
+                        <input type="text" name="entered_otp" placeholder="Enter OTP" required>
+                        <button class="btn btn-primary">Verify</button>
+                    </form>
+
+                {% elif b.status == "Ride Started" %}
+                    <a href="/complete/{{ b.id }}" class="btn btn-success">
+                        Complete Ride
+                    </a>
+
+                {% else %}
+                    Completed
+                {% endif %}
+
+            </td>
+
         </tr>
-        {% endif %}
         {% endfor %}
+
     </table>
 
 </div>

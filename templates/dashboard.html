@@ -19,6 +19,7 @@
             <th>Status</th>
             <th>Driver</th>
             <th>Contact</th>
+            <th>OTP</th>
         </tr>
 
         {% for b in bookings %}
@@ -28,21 +29,39 @@
             <td>₹{{ b.fare }}</td>
             <td>{{ b.status }}</td>
 
-            {% if b.status == "Accepted" and b.driver %}
+            {% if b.driver %}
                 <td>{{ b.driver.name }}</td>
                 <td>
                     <a href="tel:{{ b.driver.phone }}" class="btn btn-success">
-                        Call {{ b.driver.phone }}
+                        Call
                     </a>
                 </td>
             {% else %}
                 <td>-</td>
                 <td>-</td>
             {% endif %}
+
+            <td>
+                {% if b.status == "Accepted" %}
+                    <span style="color:red; font-weight:bold;">
+                        {{ b.otp }}
+                    </span>
+                    <br>
+                    <small>Share with driver</small>
+
+                {% elif b.status == "Ride Started" %}
+                    OTP Verified ✅
+
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
         </tr>
         {% endfor %}
 
     </table>
+
 </div>
 
 {% endblock %}
