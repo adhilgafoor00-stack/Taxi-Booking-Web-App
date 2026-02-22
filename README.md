@@ -16,6 +16,7 @@ Users can book rides using an interactive map, and drivers can accept rides and 
 - View ride status
 - View driver contact after acceptance
 - Click-to-call driver
+- OTP verification
 
 ### 🚗 Driver
 - Register as driver
@@ -76,7 +77,7 @@ Users can book rides using an interactive map, and drivers can accept rides and 
 - Payment gateway integration
 - Live tracking
 - Admin dashboard
-- OTP verification
+
 
 ---
 
