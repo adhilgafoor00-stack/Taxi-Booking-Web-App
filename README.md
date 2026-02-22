@@ -24,6 +24,7 @@ Users can book rides using an interactive map, and drivers can accept rides and 
 - Accept rides
 - View user contact
 - Manage accepted rides
+- OTP verification
 
 ---
 
